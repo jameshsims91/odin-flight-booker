@@ -11,13 +11,13 @@ class FlightsController < ApplicationController
     @flights = Flight.all
 
     if params[:departure_code].present?
-      @flights = @flights.joins(:departure_airport)
-                            .where(airports: { code: params[:departure_code] })
+      departure_airport = Airport.find_by(code: params[:departure_code])
+      @flights = @flights.where(departure_airport_id: departure_airport&.id)
     end
 
-    if params[:arrival_id].present?
-      @flights = @flights.joins(:arrival_airport)
-                            .where(airports: { code: params[:arrival_code] })
+    if params[:arrival_code].present?
+      arrival_airport = Airport.find_by(code: params[:arrival_code])
+      @flights = @flights.where(arrival_airport_id: arrival_airport&.id)
     end
 
     if params[:date].present?

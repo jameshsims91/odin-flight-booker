@@ -1,9 +1,12 @@
 class BookingsController < ApplicationController
   def new
-    @flight = Flight.find(params[:flight_id])
+    flight_id = params[:flight_id] || (params[:booking] && params[:booking][:flight_id])
+    @flight = Flight.find(flight_id)
     @booking = Booking.new(flight: @flight)
 
-    @num_tickets = params[:num_tickets].to_i
+    @num_tickets = params[:num_tickets] || (params[:booking] && params[:booking][:num_tickets])
+    @num_tickets = @num_tickets.present? ? @num_tickets.to_i : 1
+
     @num_tickets.times { @booking.passengers.build }
   end
 
@@ -12,9 +15,14 @@ class BookingsController < ApplicationController
     if @booking.save
       redirect_to root_path, notice: "Flight successfully booked!"
     else
-      @flight = FLight.find(booking_params[:flight_id])
+      @flight = Flight.find(booking_params[:flight_id])
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def show
+    @booking = Booking.find(params[:id])
+    @flight = @booking.flight
   end
 
   private

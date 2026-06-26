@@ -1,4 +1,7 @@
 puts "Clearing old data..."
+Passenger.destroy_all
+Booking.destroy_all
+
 Flight.destroy_all
 Airport.destroy_all
 
@@ -24,6 +27,7 @@ flight_data = [
 
 flight_data.each do |data|
   Flight.create!(
+    flight_number: [ "AA", "DL", "UA", "B6" ].sample + rand(100...999).to_s,
     departure_airport: data[:departure],
     arrival_airport: data[:arrival],
     start_datetime: data[:start],
