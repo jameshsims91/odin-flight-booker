@@ -1,0 +1,80 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Flights" %>
+
+<h1>Find a Flight</h1>
+
+<%= form_with url: flights_path, method: :get, local: true do | f | %>
+
+  <div class="form-group">
+    <%= f.label :departure_code, "From:" %>
+    <%= f.collection_select :departure_code, @airports, :code, :code, { include_blank: "Select departure airport", selected: params[:departure_code] } %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :arrival_id, "To:" %>
+    <%= f.collection_select :arrival_code, @airports, :code, :code, { include_blank: "Select arrival airport", selected: params[:arrival_code] } %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :num_tickets, "Passengers:" %>
+    <%= f.select :num_tickets, options_for_select((1..4).to_a, params[:num_tickets]), { include_blank: "Select number of tickets" } %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :date, "Date:" %>
+    <%= f.select :date, options_for_select(@flight_dates.map { | d | [d.strftime("%m/%d/%Y"), d.strftime("%Y%m%d")] }, params[:date]), { include_blank: "Select date" } %>
+  </div>
+
+  <div style="margin-top: 10px;">
+    <%= f.submit "Search Flights" %>
+  </div>
+<% end %>
+
+<hr style="margin: 30px 0;">
+
+<h2>Search Results</h2>
+
+<% if params[:departure_code].present? || params[:arrival_code].present? || params[:date].present? %>
+  <%if @flights.any? %>
+    <%= form_with url: new_booking_path, method: :get, local: true do | form | %>
+      <%= form.hidden_field :num_tickets, value: @num_tickets %>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Flight #</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Departure Time</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @flights.each do | flight | %>
+            <tr>
+              <td>
+                <%= form.radio_button :flight_id, flight.id, required: true %>
+              </td>
+              <td>FL-<%= flight.id %></td>
+              <td><strong><%= flight.departure_airport.code %></strong></td>
+              <td><strong><%= flight.arrival_airport.code %></strong></td>
+              <td><%= flight.start_datetime.strftime("%B %d, %Y at %I:%M %p") %></td>
+              <td><%= flight.duration %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 15px;">
+        <%= form.submit "Select Flight & Continue" %>
+      </div>
+    <% end %>
+  <% else %>
+    <p style="color: #d9534f;">No flights found matching your search parameters. Please try a different route or date.</p>
+  <% end %>
+<% else %>
+  <p style="color: #666;">Please select your departure, destination, and travel date to see available flights.</p>
+<% end %>
+
