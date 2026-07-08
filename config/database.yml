@@ -86,19 +86,16 @@ test:
 #
 production:
   primary: &primary_production
-    <<: *default
-    database: odin_flight_booker_production
-    username: odin_flight_booker
-    password: <%= ENV["ODIN_FLIGHT_BOOKER_DATABASE_PASSWORD"] %>
+    adapter: postgresql
+    encoding: unicode
+    url: <%= ENV["DATABASE_URL"] %>
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i + 5 %>
   cache:
     <<: *primary_production
-    database: odin_flight_booker_production_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: odin_flight_booker_production_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: odin_flight_booker_production_cable
     migrations_paths: db/cable_migrate
