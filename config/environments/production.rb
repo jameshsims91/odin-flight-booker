@@ -6,14 +6,41 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
 
-  config.action_mailer.smtp_settings = {
-    address:              ENV["MAILTRAP_HOST"],
-    port:                 ENV["MAILTRAP_PORT"] || 2525,
-    user_name:            ENV["MAILTRAP_USERNAME"],
-    password:             ENV["MAILTRAP_PASSWORD"],
-    authentication:       :plain,
-    enable_starttls_auto: true
-  }
+  # Check if Heroku passed raw strings, otherwise dynamically load via Token
+  if ENV["MAILTRAP_USERNAME"].present?
+    config.action_mailer.smtp_settings = {
+      address:              ENV["MAILTRAP_HOST"] || "sandbox.smtp.mailtrap.io",
+      port:                 ENV["MAILTRAP_PORT"] || 2525,
+      user_name:            ENV["MAILTRAP_USERNAME"],
+      password:             ENV["MAILTRAP_PASSWORD"],
+      authentication:       :plain,
+      enable_starttls_auto: true
+    }
+  else
+    # Automatically query Mailtrap API securely once on server boot
+    begin
+      require "net/http"
+      require "json"
+
+      uri = URI("https://mailtrap.io/api/v1/inboxes.json")
+      req = Net::HTTP::Get.new(uri)
+      req["Authorization"] = "Bearer #{ENV['MAILTRAP_API_TOKEN']}"
+
+      res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
+      inbox = JSON.parse(res.body).first
+
+      config.action_mailer.smtp_settings = {
+        address:              inbox["domain"] || "sandbox.smtp.mailtrap.io",
+        port:                 inbox["smtp_ports"]&.first || 2525,
+        user_name:            inbox["username"],
+        password:             inbox["password"],
+        authentication:       :plain,
+        enable_starttls_auto: true
+      }
+    rescue => e
+      Rails.logger.error "Mailtrap initialization failed: #{e.message}"
+    end
+  end
   # Code is not reloaded between requests.
   config.enable_reloading = false
 
