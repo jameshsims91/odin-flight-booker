@@ -15,7 +15,7 @@ class BookingsController < ApplicationController
     # save! triggers a red crash screen if data is invalid, making debugging easy
     if @booking.save
       @booking.passengers.each do | passenger |
-        PassengerMailer.booking_confirmation(passenger, @booking).deliver_later
+        PassengerMailer.booking_confirmation(passenger, @booking).deliver_now
       end
 
       redirect_to @booking, notice: "Booking successfully completed! Confirmation emails have been sent.", status: :see_other
