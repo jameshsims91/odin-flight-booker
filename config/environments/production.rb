@@ -9,7 +9,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address:              ENV["MAILTRAP_HOST"],
     port:                 ENV["MAILTRAP_PORT"] || 2525,
-    user_name:            ENV["MAILTRAP_USER_NAME"],
+    user_name:            ENV["MAILTRAP_USERNAME"],
     password:             ENV["MAILTRAP_PASSWORD"],
     authentication:       :plain,
     enable_starttls_auto: true
