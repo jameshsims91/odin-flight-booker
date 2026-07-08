@@ -13,7 +13,7 @@ class BookingsController < ApplicationController
   def create
     @booking = Booking.new(booking_params)
     # save! triggers a red crash screen if data is invalid, making debugging easy
-    if @booking.save!
+    if @booking.save
       @booking.passengers.each do | passenger |
         PassengerMailer.booking_confirmation(passenger, @booking).deliver_later
       end
