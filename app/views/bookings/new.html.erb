@@ -6,33 +6,67 @@
   <p><strong>Route:</strong> <%= @flight.departure_airport.code %> to <%= @flight.arrival_airport.code %></p>
   <p><strong>Date & Time:</strong> <%= @flight.start_datetime.strftime("%A, %B %d, %Y at %I:%M %p") %></p>
   <p><strong>Duration:</strong> <%= @flight.duration %> minutes</p>
-  <p><strong>Tickets Selected:</strong> <%= @num_tickets %></p>
+  <p><strong>Tickets Selected:</strong> <span id="tickets-count"><%= @num_tickets %></span></p>
 </div>
 
 <h2>Passenger Information</h2>
 
-<%= form_with model: @booking, local: true do | f | %>
+<%= form_with model: @booking, local: true, data: { controller: "nested-form" } do | f | %>
   <%= f.hidden_field :flight_id, value: @flight.id %>
 
-  <%= f.fields_for :passengers do | passenger_f | %>
-    <fieldset style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 4px;">
-      <legend><strong>Passenger #<%= passenger_f.index + 1 %></strong></legend>
+  <div data-nested-form-target="container">
+    <%= f.fields_for :passengers do | passenger_f | %>
+      <div class="passenger-wrapper" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 4px;"> 
+        <fieldset class="passenger-fields" style="border: none; padding:0; margin:0;">
+          <legend><strong>Passenger #<%= passenger_f.index + 1 %></strong></legend>
+          <%= passenger_f.hidden_field :_destroy, class: "destroy-flag", value: "0" %>
 
-      <div class="form-group" style="margin-bottom: 10px;">
-        <%= passenger_f.label :name, "Full Name:" %>
-        <%= passenger_f.text_field :name, required: true, style: "width: 100%; padding:5px;" %>
-      </div>
+          <div class="form-group" style="margin-bottom: 10px;">
+            <%= passenger_f.label :name, "Full Name:" %>
+            <%= passenger_f.text_field :name, required: true, style: "width: 100%; padding:5px;" %>
+          </div>
 
-      <div class="form-group">
-        <%= passenger_f.label :email, "Email Address:" %>
-        <%= passenger_f.email_field :email, required: true, style: "width: 100%; padding: 5px;" %>
+          <div class="form-group">
+            <%= passenger_f.label :email, "Email Address:" %>
+            <%= passenger_f.email_field :email, required: true, style: "width: 100%; padding: 5px;" %>
+          </div>
+
+          <button type="button" data-action="click->nested-form#remove" style="padding: 3px 10px; background-color: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Remove Passenger
+          </button>        
+        </fieldset>
       </div>
-    </fieldset>
-  <% end %>
+    <% end %>
+  </div>
+
+  <button type="button" data-action="click->nested-form#add" style="padding: 5px 15px; background-color: #5cb85c; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 20px;">
+    Add Passenger
+  </button>
 
   <div style="margin-top: 20px;">
     <%= f.submit "Purchase Tickets", style: "padding: 10px 20px; background-color: #0275d8; color: white; border: none; border-radius: 4px; cursor: pointer;" %>
   </div>
 <% end %>
 
+<!-- MOVE TEMPLATE HERE (OUTSIDE THE FORM Builder Tag) -->
+<template data-nested-form-target="template">
+  <div class="passenger-wrapper" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 4px;">
+    <fieldset class="passenger-fields" style="border: none; padding:0; margin:0;">
+      <legend><strong>Passenger #<span class="passenger-number"></span></strong></legend>
 
+      <div class="form-group" style="margin-bottom: 10px;">
+        <label for="booking_passengers_attributes_INDEX_name">Full Name:</label>
+        <input type="text" name="booking[passengers_attributes][INDEX][name]" id="booking_passengers_attributes_INDEX_name" required="required" style="width: 100%; padding: 5px;">
+      </div>
+
+      <div class="form-group">
+        <label for="booking_passengers_attributes_INDEX_email">Email Address:</label>
+        <input type="email" name="booking[passengers_attributes][INDEX][email]" id="booking_passengers_attributes_INDEX_email" required="required" style="width: 100%; padding: 5px;">
+      </div>
+
+      <button type="button" data-action="click->nested-form#remove" style="padding: 3px 10px; background-color: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Remove Passenger
+      </button>
+    </fieldset>
+  </div>
+</template>

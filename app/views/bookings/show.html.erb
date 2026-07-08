@@ -1,38 +1,40 @@
-<h1>Booking Confirmed!</h1>
-<p style="color: green; font-weight: bold;"><%= notice %></p>
+<%= turbo_frame_tag "booking_detail" do %>
+  <h1>Booking Confirmed!</h1>
+  <p style="color: green; font-weight: bold;"><%= notice %></p>
 
-<div class="receipt-card" style="border: 1px solid #ddd; padding: 20px; border-radius: 4px; background: #fafafa;">
-  <h3>Confirmation Code: #BKG-<%= @booking.id %></h3>
-  <p><strong>Route:</strong>
-   <span style="font-size: 1.2em; color: #0275d8;"><%= @booking.flight.departure_airport.code %></span>
-   →
-   <span style="font-size: 1.2em; color: #5cb75c;"><%= @booking.flight.arrival_airport.code %></span>
-  </p>
-  <p><strong>Departure Time:</strong> <%= @flight.start_datetime.strftime("%A, %B %d, %Y at %I:%M %p") %></p>
-  <p><strong>Duration:</strong> <%= @fliht.duration %> minutes</p>
+  <div class="receipt-card" style="border: 1px solid #ddd; padding: 20px; border-radius: 4px; background: #fafafa;">
+    <h3>Confirmation Code: #BKG-<%= @booking.id %></h3>
+    <p><strong>Route:</strong>
+    <span style="font-size: 1.2em; color: #0275d8;"><%= @booking.flight.departure_airport.code %></span>
+    →
+    <span style="font-size: 1.2em; color: #5cb75c;"><%= @booking.flight.arrival_airport.code %></span>
+    </p>
+    <p><strong>Departure Time:</strong> <%= @flight.start_datetime.strftime("%A, %B %d, %Y at %I:%M %p") %></p>
+    <p><strong>Duration:</strong> <%= @flight.duration %> minutes</p>
 
-  <hr style="border-color: #ddd; margin-top: 25px;">
+    <hr style="border-color: #ddd; margin-top: 25px;">
 
-  <h3>Passenger Breakdown</h3>
-  <table width="100%" cellpadding="8" style="border-collapse: collapse;">
-    <thead>
-      <tr style="text-align: left; border-bottom: 2px solid #ddd; background-color: #eaeaea;">
-        <th>#</th>
-        <th>Name</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @booking.passengers.each_with_index do | passenger, idx | %>
-        <tr style="border-bottom: 1px solid #eee;">
-          <td><strong><%= idx + 1 %></strong></td>
-          <td><%= passenger.name %></td>
-          <td><%+ passenger.email %></td>
+    <h3>Passenger Breakdown</h3>
+    <table width="100%" cellpadding="8" style="border-collapse: collapse;">
+      <thead>
+        <tr style="text-align: left; border-bottom: 2px solid #ddd; background-color: #eaeaea;">
+          <th>#</th>
+          <th>Name</th>
+          <th>Email</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody>
+        <% @booking.passengers.each_with_index do | passenger, idx | %>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td><strong><%= idx + 1 %></strong></td>
+            <td><%= passenger.name %></td>
+            <td><%= passenger.email %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
 
 <p style="margin-top: 30px;">
   <%= link_to "Book Another Flight", root_path, style: "text-decoration: none: color: #0275d8; font-weight: bold;" %>

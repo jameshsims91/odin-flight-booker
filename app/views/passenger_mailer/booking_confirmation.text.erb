@@ -1,0 +1,13 @@
+Hi <%= @passenger.name %>, pack your bags!
+
+Your ticket has been succesfully booked and confirmed.
+
+Flight Details:
+- Flight Number: Fl-<%= @flight.id %>
+- Route: <%= @flight.departure_airport.code %> to <%= @flight.arrival_airport.code %>
+- Date & Time: <%= @flight.start_datetime.strftime("%A, %B %d, %Y at %I:%M %p") %>
+
+All Passengers on this Booking:
+<% @booking.passengers.each do | p | %>
+- <%= p.name %> (<%= p.email %>)
+<% end %>

@@ -1,7 +1,7 @@
 class BookingsController < ApplicationController
   def new
     flight_id = params[:flight_id] || (params[:booking] && params[:booking][:flight_id])
-    @flight = Flight.find(flight_id)
+    @flight = Flight.find(params[:flight_id])
     @booking = Booking.new(flight: @flight)
 
     @num_tickets = params[:num_tickets] || (params[:booking] && params[:booking][:num_tickets])
@@ -12,22 +12,26 @@ class BookingsController < ApplicationController
 
   def create
     @booking = Booking.new(booking_params)
-    if @booking.save
-      redirect_to root_path, notice: "Flight successfully booked!"
+    if @booking.save!
+      @booking.passengers.each do | passenger |
+        PassengerMailer.booking_confirmation(passenger, @booking).deliver_later
+      end
+
+      redirect_to @booking, notice: "Booking successfully completed! Confirmation emails have been sent."
     else
-      @flight = Flight.find(booking_params[:flight_id])
+      @flight = Flight.find(params[:booking][:flight_id])
       render :new, status: :unprocessable_entity
     end
   end
 
   def show
-    @booking = Booking.find(params[:id])
+    @booking = Booking.includes(:passengers).find(params[:id])
     @flight = @booking.flight
   end
 
   private
 
   def booking_params
-    params.expect(booking: [ :flight_id, passengers_attributes: [ :id, :name, :email ] ])
+    params.expect(booking: [ :flight_id, passengers_attributes: [ :id, :name, :email, :_destroy ] ])
   end
 end
