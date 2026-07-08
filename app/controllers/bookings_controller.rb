@@ -26,7 +26,8 @@ class BookingsController < ApplicationController
   end
 
   def show
-    @booking = Booking.includes(:passengers).find(params[:id])
+    # @booking = Booking.includes(:passengers).find(params[:id])
+    @booking = Booking.find(params[:id])
     @flight = @booking.flight
   end
 
