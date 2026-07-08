@@ -4,8 +4,5 @@
 
 import { application } from "controllers/application"
 
-import HelloController from "controllers/hello_controller"
-application.register("hello", HelloController)
-
-import NestedFormController from "controllers/nested_form_controller"
-application.register("nested-form", NestedFormController)
+import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
+eagerLoadControllersFrom("controllers", application)

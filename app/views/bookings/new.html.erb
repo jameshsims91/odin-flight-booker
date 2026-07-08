@@ -11,7 +11,7 @@
 
 <h2>Passenger Information</h2>
 
-<%= form_with model: @booking, local: true, data: { controller: "nested-form" } do | f | %>
+<%= form_with model: @booking, local: true, data: { controller: "nested-form", turbo: false} do | f | %>
   <%= f.hidden_field :flight_id, value: @flight.id %>
 
   <div data-nested-form-target="container">
@@ -54,13 +54,16 @@
     <fieldset class="passenger-fields" style="border: none; padding:0; margin:0;">
       <legend><strong>Passenger #<span class="passenger-number"></span></strong></legend>
 
+      <input type="hidden" name="booking[passengers_attributes][INDEX][id]" id="booking_passengers_attributes_INDEX_id">
+      <input type="hidden" name="booking[passengers_attributes][INDEX][_destroy]" class="destroy-flag" value="0" id="booking_passengers_attributes_INDEX__destroy">
+
       <div class="form-group" style="margin-bottom: 10px;">
-        <label for="booking_passengers_attributes_INDEX_name">Full Name:</label>
-        <input type="text" name="booking[passengers_attributes][INDEX][name]" id="booking_passengers_attributes_INDEX_name" required="required" style="width: 100%; padding: 5px;">
+        <label for="booking_passengers_attributes_INDEX_name">Name:</label>
+        <input type="text" name="booking[passengers_attributes][INDEX][name]" id="booking_passengers_attributes_INDEX_name" placeholder="Passenger Name" required="required" style="width: 100%; padding: 5px;">
       </div>
 
       <div class="form-group">
-        <label for="booking_passengers_attributes_INDEX_email">Email Address:</label>
+        <label for="booking_passengers_attributes_INDEX_email">Email:</label>
         <input type="email" name="booking[passengers_attributes][INDEX][email]" id="booking_passengers_attributes_INDEX_email" required="required" style="width: 100%; padding: 5px;">
       </div>
 

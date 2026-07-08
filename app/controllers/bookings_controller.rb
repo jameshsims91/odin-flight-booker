@@ -1,7 +1,7 @@
 class BookingsController < ApplicationController
   def new
     flight_id = params[:flight_id] || (params[:booking] && params[:booking][:flight_id])
-    @flight = Flight.find(params[:flight_id])
+    @flight = Flight.find(flight_id)
     @booking = Booking.new(flight: @flight)
 
     @num_tickets = params[:num_tickets] || (params[:booking] && params[:booking][:num_tickets])
@@ -12,12 +12,13 @@ class BookingsController < ApplicationController
 
   def create
     @booking = Booking.new(booking_params)
+    # save! triggers a red crash screen if data is invalid, making debugging easy
     if @booking.save!
       @booking.passengers.each do | passenger |
         PassengerMailer.booking_confirmation(passenger, @booking).deliver_later
       end
 
-      redirect_to @booking, notice: "Booking successfully completed! Confirmation emails have been sent."
+      redirect_to @booking, notice: "Booking successfully completed! Confirmation emails have been sent.", status: :see_other
     else
       @flight = Flight.find(params[:booking][:flight_id])
       render :new, status: :unprocessable_entity
@@ -32,6 +33,9 @@ class BookingsController < ApplicationController
   private
 
   def booking_params
-    params.expect(booking: [ :flight_id, passengers_attributes: [ :id, :name, :email, :_destroy ] ])
+    params.require(:booking).permit(
+      :flight_id,
+      passengers_attributes: [ :id, :name, :email, :_destroy ]
+    )
   end
 end

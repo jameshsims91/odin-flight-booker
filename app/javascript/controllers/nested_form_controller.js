@@ -15,15 +15,9 @@ export default class extends Controller {
 
     const content = this.templateTarget.content.cloneNode(true)
     
-    content.querySelectorAll("input, label").forEach((element) => {
+    content.querySelectorAll("input").forEach((element) => {
       if (element.hasAttribute("name")) {
         element.setAttribute("name", element.getAttribute("name").replace(/INDEX/g, nextIndex))
-      }
-      if (element.hasAttribute("id")) {
-        element.setAttribute("id", element.getAttribute("id").replace(/INDEX/g, nextIndex))
-      }
-      if (element.hasAttribute("for")) {
-        element.setAttribute("for", element.getAttribute("for").replace(/INDEX/g, nextIndex))
       }
     })
 
